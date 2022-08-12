@@ -2,4 +2,4 @@
 
 ## 정덕우
 
-### ## FrontEnd 개발자
+### FrontEnd 개발자
