@@ -1,22 +1,46 @@
 import React, { ReactElement } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 type ButtonFunctionalComponent = {
-  (props: { children: string }): ReactElement;
+  (props: {
+    children: string;
+    clickHandler: React.MouseEventHandler<HTMLButtonElement>;
+    disabled: boolean;
+  }): ReactElement;
 };
 
-const ButtonComponent: ButtonFunctionalComponent = ({ children }) => {
-  return <BasicButton disabled>{children}</BasicButton>;
+const ButtonComponent: ButtonFunctionalComponent = ({
+  children,
+  clickHandler,
+  disabled,
+}) => {
+  return (
+    <BasicButton onClick={clickHandler} disabled={disabled}>
+      {children}
+    </BasicButton>
+  );
 };
 
 export default ButtonComponent;
 
-const BasicButton = styled.button`
+const BasicButton = styled.button<{ disabled: boolean }>`
   width: 100%;
   height: 3rem;
-  background-color: dodgerblue;
-  color: blue;
   border: none;
   border-radius: 10px;
   font-size: 1.5rem;
+  ${({ disabled }) => {
+    if (disabled) {
+      return css`
+        background-color: grey;
+        color: white;
+      `;
+    } else {
+      return css`
+        background-color: dodgerblue;
+        color: black;
+        cursor: pointer;
+      `;
+    }
+  }}
 `;

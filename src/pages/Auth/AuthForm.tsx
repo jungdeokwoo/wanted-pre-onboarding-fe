@@ -1,7 +1,17 @@
-import React, { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useState,
+  useMemo,
+} from "react";
 import styled from "styled-components";
 import InputComponent from "../../components/InputComponent";
 import ButtonComponent from "../../components/ButtonComponent";
+import { FetchApi } from "../../utils/FetchApi";
+import { requestHeaders } from "../../utils/RequestHeaders";
+import { configURL } from "../../config";
+import { useNavigate } from "react-router-dom";
 
 export interface UserInfo {
   email: string;
@@ -13,15 +23,74 @@ type AuthFormComponent = {
     children: string;
     isSignIn: boolean;
     setIsSignIn: Dispatch<SetStateAction<boolean>>;
+    setErrorMessage: Dispatch<SetStateAction<string>>;
   }): ReactElement;
 };
 
-const AuthForm: AuthFormComponent = ({ children, isSignIn, setIsSignIn }) => {
+const AuthForm: AuthFormComponent = ({
+  children,
+  isSignIn,
+  setIsSignIn,
+  setErrorMessage,
+}) => {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+  const navigate = useNavigate();
+
+  const isValidUserInfo = useMemo(
+    () =>
+      userInfo.email?.includes("@") &&
+      userInfo.email?.includes(".") &&
+      userInfo.password?.length >= 8,
+    [userInfo.email, userInfo.password]
+  );
 
   const changeForm = () => {
     setIsSignIn(!isSignIn);
     setUserInfo({} as UserInfo);
+    setErrorMessage("");
+  };
+
+  const signInHandler = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    const response = await FetchApi.post(
+      configURL.signIn,
+      userInfo,
+      requestHeaders
+    );
+    if (response.ok) {
+      const result = await response.json();
+      localStorage.setItem("token", result.access_token);
+      navigate("/todo", { replace: true });
+    } else {
+      const result = await response.json();
+      console.log(result);
+      if (result.message === "Unauthorized") {
+        setErrorMessage(`비밀번호를 다시 확인해주세요`);
+      } else {
+        setErrorMessage(`${result.message}`);
+      }
+    }
+  };
+
+  const signUpHandler = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    const response = await FetchApi.post(
+      configURL.signUp,
+      userInfo,
+      requestHeaders
+    );
+    if (response.ok) {
+      const result = await response.json();
+      localStorage.setItem("token", result.access_token);
+      navigate("/todo", { replace: true });
+    } else {
+      const result = await response.json();
+      setErrorMessage(`${result.message}`);
+    }
   };
 
   return (
@@ -46,7 +115,12 @@ const AuthForm: AuthFormComponent = ({ children, isSignIn, setIsSignIn }) => {
       </InputWrapper>
       {isSignIn ? (
         <ButtonWrapper>
-          <SignInButton>로그인</SignInButton>
+          <SignInButton
+            clickHandler={(event) => signInHandler(event)}
+            disabled={!isValidUserInfo}
+          >
+            로그인
+          </SignInButton>
           <SignupMessage>
             회원이 아니신가요?{" "}
             <SignupText onClick={changeForm}>회원가입</SignupText>
@@ -54,7 +128,12 @@ const AuthForm: AuthFormComponent = ({ children, isSignIn, setIsSignIn }) => {
         </ButtonWrapper>
       ) : (
         <ButtonWrapper>
-          <SignInButton>회원가입</SignInButton>
+          <SignUpButton
+            clickHandler={(event) => signUpHandler(event)}
+            disabled={!isValidUserInfo}
+          >
+            회원가입
+          </SignUpButton>
           <SignupText onClick={changeForm}>로그인화면으로 돌아가기</SignupText>
         </ButtonWrapper>
       )}
@@ -109,6 +188,8 @@ const SignupMessage = styled.p`
 `;
 
 const SignInButton = styled(ButtonComponent)``;
+
+const SignUpButton = styled(ButtonComponent)``;
 
 const SignupText = styled.span`
   color: blue;

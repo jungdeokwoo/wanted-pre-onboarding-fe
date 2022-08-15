@@ -4,8 +4,11 @@ import { Navigate } from "react-router-dom";
 const TodoList = () => {
   return (
     <>
-      {localStorage.getItem("token") ?? <Navigate to={"/"} replace />}
-      <div>todo리스트</div>
+      {localStorage.getItem("token") ? (
+        <div>todo리스트</div>
+      ) : (
+        <Navigate to={"/"} replace />
+      )}
     </>
   );
 };
