@@ -40,6 +40,7 @@ const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
   const returnModify = () => {
     setIsModify(!isModify);
     setModifyText({ todo: todo });
+    setIsFinished(isCompleted);
   };
 
   const checkedHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
