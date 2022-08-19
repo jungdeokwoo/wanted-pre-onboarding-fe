@@ -22,6 +22,8 @@
 
 회원가입이 성공한 경우에 발급된 jwt토큰을 localstorage에 저장하고 todo 페이지로 바로 이동하도록 하였습니다.
 
+[](https://user-images.githubusercontent.com/97271725/185528246-41b8e4c5-a536-493c-8fef-2d53ce56cc68.mov)
 
+로그인 시도시 존재하지 않는 이메일인경우 또는 비밀번호가 틀린경우에는 오른쪽 상단에 알람창을 띄우고
 
-
+로그인을 성공한 경우에는 회원가입과 마찬가지로 localstorage에 토큰을 저장 후 todo 페이지로 이동시켰습니다.
