@@ -20,6 +20,7 @@ const TodoList = () => {
   const [createTodoText, setCreateTodoText] = useState<InputStringValue>({
     todo: "",
   });
+  const [modifyItemId, setModifyItemId] = useState<number | null>(null);
   const location = useLocation();
   const FetchTodo = FetchApi();
 
@@ -46,6 +47,7 @@ const TodoList = () => {
       if (reResponse.ok) {
         const result = await reResponse.json();
         setTodoLists(result);
+        setModifyItemId(null);
       } else {
         console.log("인터넷 연결을 확인해주세요");
       }
@@ -78,7 +80,9 @@ const TodoList = () => {
               <TodoListItem
                 key={list.id}
                 listInfo={list}
-                setStateValue={setTodoLists}
+                modifyItemId={modifyItemId}
+                setTodoLists={setTodoLists}
+                setModifyItemId={setModifyItemId}
               />
             ))}
           </TodoLists>

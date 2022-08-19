@@ -9,13 +9,19 @@ import InputComponent, { InputStringValue } from "../components/InputComponent";
 type TodoListItemProps = {
   (props: {
     listInfo: TodoLists;
-    setStateValue: Dispatch<SetStateAction<TodoLists[]>>;
+    modifyItemId: number | null;
+    setTodoLists: Dispatch<SetStateAction<TodoLists[]>>;
+    setModifyItemId: Dispatch<SetStateAction<number | null>>;
   }): ReactElement;
 };
 
-const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
+const TodoListItem: TodoListItemProps = ({
+  listInfo,
+  modifyItemId,
+  setTodoLists,
+  setModifyItemId,
+}) => {
   const { id, todo, isCompleted } = listInfo;
-  const [isModify, setIsModify] = useState(false);
   const [modifyText, setModifyText] = useState<InputStringValue>({
     todo: todo,
   });
@@ -28,17 +34,17 @@ const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
       const reResponse = await fetchTodo.get(configURL.todo);
       if (response.ok) {
         const result = await reResponse.json();
-        setStateValue(result);
+        setTodoLists(result);
       }
     }
   };
 
-  const changeForm = () => {
-    setIsModify(!isModify);
+  const changeForm = (itemId: number) => {
+    setModifyItemId(itemId);
   };
 
-  const returnModify = () => {
-    setIsModify(!isModify);
+  const cancleModify = () => {
+    setModifyItemId(null);
     setModifyText({ todo: todo });
     setIsFinished(isCompleted);
   };
@@ -53,18 +59,18 @@ const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
       isCompleted: isFinished,
     });
     if (response.ok) {
-      setIsModify(!isModify);
+      setModifyItemId(null);
       const reResponse = await fetchTodo.get(configURL.todo);
       if (response.ok) {
         const result = await reResponse.json();
-        setStateValue(result);
+        setTodoLists(result);
       }
     }
   };
 
   return (
     <ItemContainer>
-      {isModify ? (
+      {modifyItemId === id ? (
         <>
           <InputWrapper>
             <InputComponent
@@ -86,7 +92,7 @@ const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
             <ModifyFinish disabled={false} onClick={() => modifyHandler()}>
               수정 완료
             </ModifyFinish>
-            <ReturnButton disabled={false} onClick={() => returnModify()}>
+            <ReturnButton disabled={false} onClick={() => cancleModify()}>
               취소
             </ReturnButton>
           </ButtonWrapper>
@@ -96,7 +102,7 @@ const TodoListItem: TodoListItemProps = ({ listInfo, setStateValue }) => {
           <ItemTitle isCompleted={isCompleted}>{todo}</ItemTitle>
           <CompleteText>{isCompleted ? "완료" : "미완료"}</CompleteText>
           <ButtonWrapper>
-            <ModifyButton disabled={false} onClick={() => changeForm()}>
+            <ModifyButton disabled={false} onClick={() => changeForm(id)}>
               수정
             </ModifyButton>
             <DeleteButton disabled={false} onClick={() => deleteHandler()}>
