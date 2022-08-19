@@ -11,3 +11,4 @@
 
 
 1. Auth 관련 (로그인, 회원가입페이지)
+[](https://user-images.githubusercontent.com/97271725/185526637-2bdd7aa7-a057-482e-882c-391326b9e28b.mov)
