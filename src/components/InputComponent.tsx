@@ -1,49 +1,44 @@
 import React, { ReactElement, Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
-import { UserInfo } from "../pages/Auth/AuthForm";
+
+export type InputStringValue = { [key in string]?: string };
 
 type InputFuctionalComponent = {
   (props: {
     children: string;
-    inputValue: string;
-    setUserInfo: Dispatch<SetStateAction<UserInfo>>;
+    inputValue: string | undefined;
+    setStateValue: Dispatch<SetStateAction<InputStringValue>>;
   }): ReactElement;
 };
 
 const InputComponent: InputFuctionalComponent = ({
   children,
   inputValue,
-  setUserInfo,
+  setStateValue,
 }) => {
   const inputHandler = (
     event: React.ChangeEvent<HTMLInputElement>,
     key: string
   ) => {
     const inputValue = event.target.value;
-    setUserInfo((prev) => ({ ...prev, [key]: inputValue }));
+    setStateValue((prev: InputStringValue) => ({
+      ...prev,
+      [key]: inputValue,
+    }));
   };
 
   return (
-    <InputWrapper>
-      <InputBox
-        type={children === "password" ? "password" : "text"}
-        value={inputValue || ""}
-        onChange={(event) => inputHandler(event, children)}
-      />
-    </InputWrapper>
+    <InputBox
+      type={children === "password" ? "password" : "text"}
+      value={inputValue || ""}
+      onChange={(event) => inputHandler(event, children)}
+    />
   );
 };
 
 export default InputComponent;
 
-const InputWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-`;
-
-const InputBox = styled.input`
+export const InputBox = styled.input`
   width: 100%;
   height: 3rem;
   padding: 15px;

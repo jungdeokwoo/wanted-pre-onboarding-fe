@@ -7,11 +7,11 @@ import React, {
 } from "react";
 import styled from "styled-components";
 import InputComponent from "../../components/InputComponent";
-import ButtonComponent from "../../components/ButtonComponent";
-import { FetchApi } from "../../utils/FetchApi";
-import { requestHeaders } from "../../utils/RequestHeaders";
+import { BasicButton } from "../../components/ButtonComponent";
+import FetchApi from "../../utils/FetchApi";
 import { configURL } from "../../config";
 import { useNavigate } from "react-router-dom";
+import { InputStringValue } from "../../components/InputComponent";
 
 export interface UserInfo {
   email: string;
@@ -33,20 +33,26 @@ const AuthForm: AuthFormComponent = ({
   setIsSignIn,
   setErrorMessage,
 }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+  const [userInfo, setUserInfo] = useState<InputStringValue>({
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
+  const FetchAuth = FetchApi();
 
-  const isValidUserInfo = useMemo(
-    () =>
-      userInfo.email?.includes("@") &&
-      userInfo.email?.includes(".") &&
-      userInfo.password?.length >= 8,
-    [userInfo.email, userInfo.password]
-  );
+  const isValidUserInfo = useMemo(() => {
+    if (userInfo.email !== undefined && userInfo.password !== undefined) {
+      return (
+        userInfo.email?.includes("@") &&
+        userInfo.email?.includes(".") &&
+        userInfo.password.length >= 8
+      );
+    }
+  }, [userInfo.email, userInfo.password]);
 
   const changeForm = () => {
     setIsSignIn(!isSignIn);
-    setUserInfo({} as UserInfo);
+    setUserInfo({} as InputStringValue);
     setErrorMessage("");
   };
 
@@ -54,18 +60,13 @@ const AuthForm: AuthFormComponent = ({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    const response = await FetchApi.post(
-      configURL.signIn,
-      userInfo,
-      requestHeaders
-    );
+    const response = await FetchAuth.post(configURL.signIn, userInfo);
     if (response.ok) {
       const result = await response.json();
       localStorage.setItem("token", result.access_token);
       navigate("/todo", { replace: true });
     } else {
       const result = await response.json();
-      console.log(result);
       if (result.message === "Unauthorized") {
         setErrorMessage(`비밀번호를 다시 확인해주세요`);
       } else {
@@ -78,11 +79,7 @@ const AuthForm: AuthFormComponent = ({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    const response = await FetchApi.post(
-      configURL.signUp,
-      userInfo,
-      requestHeaders
-    );
+    const response = await FetchAuth.post(configURL.signUp, userInfo);
     if (response.ok) {
       const result = await response.json();
       localStorage.setItem("token", result.access_token);
@@ -99,7 +96,10 @@ const AuthForm: AuthFormComponent = ({
       <InputWrapper>
         <EmailWrapper>
           <InputTitle>이메일</InputTitle>
-          <InputComponent inputValue={userInfo.email} setUserInfo={setUserInfo}>
+          <InputComponent
+            inputValue={userInfo.email}
+            setStateValue={setUserInfo}
+          >
             email
           </InputComponent>
         </EmailWrapper>
@@ -107,7 +107,7 @@ const AuthForm: AuthFormComponent = ({
           <InputTitle>패스워드</InputTitle>
           <InputComponent
             inputValue={userInfo.password}
-            setUserInfo={setUserInfo}
+            setStateValue={setUserInfo}
           >
             password
           </InputComponent>
@@ -116,7 +116,7 @@ const AuthForm: AuthFormComponent = ({
       {isSignIn ? (
         <ButtonWrapper>
           <SignInButton
-            clickHandler={(event) => signInHandler(event)}
+            onClick={(event) => signInHandler(event)}
             disabled={!isValidUserInfo}
           >
             로그인
@@ -129,7 +129,7 @@ const AuthForm: AuthFormComponent = ({
       ) : (
         <ButtonWrapper>
           <SignUpButton
-            clickHandler={(event) => signUpHandler(event)}
+            onClick={(event) => signUpHandler(event)}
             disabled={!isValidUserInfo}
           >
             회원가입
@@ -187,9 +187,9 @@ const SignupMessage = styled.p`
   font-size: 1rem;
 `;
 
-const SignInButton = styled(ButtonComponent)``;
+const SignInButton = styled(BasicButton)``;
 
-const SignUpButton = styled(ButtonComponent)``;
+const SignUpButton = styled(BasicButton)``;
 
 const SignupText = styled.span`
   color: blue;
