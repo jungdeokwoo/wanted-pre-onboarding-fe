@@ -7,7 +7,10 @@
 - react를 활용한 프로젝트 개발
 - 로그인, 회원가입 및 todo리스트 생성,삭제,수정 구현
 - typeScript, styledcomponent, React Router 활용
-- npm start로 프로젝트 시작
+
+### 프로젝트 실행
+
+npm start 로 localhost:3000/ 접속
 
 
 1. Auth 관련 (로그인, 회원가입페이지)
