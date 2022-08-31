@@ -41,18 +41,16 @@ const AuthForm: AuthFormComponent = ({
   const FetchAuth = FetchApi();
 
   const isValidUserInfo = useMemo(() => {
-    if (userInfo.email !== undefined && userInfo.password !== undefined) {
-      return (
-        userInfo.email?.includes("@") &&
-        userInfo.email?.includes(".") &&
-        userInfo.password.length >= 8
-      );
-    }
+    return (
+      userInfo.email?.includes("@") &&
+      userInfo.email?.includes(".") &&
+      userInfo.password.length >= 8
+    );
   }, [userInfo.email, userInfo.password]);
 
   const changeForm = () => {
     setIsSignIn(!isSignIn);
-    setUserInfo({} as InputStringValue);
+    setUserInfo({ email: "", password: "" });
     setErrorMessage("");
   };
 

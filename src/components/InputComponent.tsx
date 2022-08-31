@@ -1,12 +1,12 @@
 import React, { ReactElement, Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
 
-export type InputStringValue = { [key in string]?: string };
+export type InputStringValue = { [key in string]: string };
 
 type InputFuctionalComponent = {
   (props: {
     children: string;
-    inputValue: string | undefined;
+    inputValue: string;
     setStateValue: Dispatch<SetStateAction<InputStringValue>>;
   }): ReactElement;
 };
